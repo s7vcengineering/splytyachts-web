@@ -22,6 +22,7 @@
   "rewrites": [
     { "source": "/invite/:code", "destination": "/invite.html" },
     { "source": "/experience/:id", "destination": "/experience.html" },
+    { "source": "/download", "destination": "/download.html" },
     { "source": "/help", "destination": "/help.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },

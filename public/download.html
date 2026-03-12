@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download SPLYT</title>
+  <meta name="description" content="Download the SPLYT app to split yacht charters and water experiences with your crew.">
+  <meta property="og:title" content="Download SPLYT">
+  <meta property="og:description" content="Split yacht charters with your crew. Download the app.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="app-icon.png">
+  <link rel="apple-touch-icon" href="app-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --deep-ocean: #0A1628;
+      --dark-navy: #0D1F3C;
+      --light-blue: #4FC3F7;
+      --sea-blue: #2196F3;
+      --text-primary: #E8F0FE;
+      --text-secondary: #8EACCD;
+      --text-muted: #5A7A9A;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--deep-ocean);
+      color: var(--text-secondary);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 24px;
+      text-align: center;
+      border-bottom: 1px solid rgba(79, 195, 247, 0.08);
+    }
+    .header a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 64px 24px 80px;
+      text-align: center;
+    }
+    .app-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+      margin-bottom: 32px;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+    .store-links {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 300px;
+    }
+    .store-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .store-btn:hover {
+      transform: translateY(-2px);
+    }
+    .store-btn:active {
+      transform: translateY(0);
+    }
+    .store-btn-apple {
+      background: var(--text-primary);
+      color: var(--deep-ocean);
+    }
+    .store-btn-android {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-secondary);
+      border: 1px solid rgba(79, 195, 247, 0.15);
+      cursor: default;
+      opacity: 0.6;
+    }
+    .store-btn-android:hover {
+      transform: none;
+    }
+    .store-btn svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .coming-soon {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.7;
+    }
+    .footer {
+      padding: 24px;
+      text-align: center;
+      border-top: 1px solid rgba(79, 195, 247, 0.08);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .footer a:hover {
+      color: var(--light-blue);
+    }
+    .redirect-msg {
+      display: none;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 24px;
+    }
+  </style>
+  <script>
+    (function() {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPhone|iPad|iPod/i.test(ua);
+      var appStoreUrl = 'https://apps.apple.com/app/splyt/id6740092740';
+
+      if (isIOS) {
+        window.location.href = appStoreUrl;
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="header">
+    <a href="/">SPLYT</a>
+  </div>
+
+  <div class="content">
+    <img src="app-icon.png" alt="SPLYT" class="app-icon">
+    <h1>Get SPLYT</h1>
+    <p class="subtitle">Split yacht charters and water experiences with your crew. Same luxury, fraction of the cost.</p>
+
+    <div class="store-links">
+      <a href="https://apps.apple.com/app/splyt/id6740092740" class="store-btn store-btn-apple" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download for iPhone
+      </a>
+      <div class="store-btn store-btn-android">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 2.273l-1.837 3.18A8.953 8.953 0 0 0 12 4.5a8.95 8.95 0 0 0-3.686.953L6.477 2.273a.5.5 0 1 0-.866.5l1.81 3.135A9.006 9.006 0 0 0 3 13.5h18a9.006 9.006 0 0 0-4.42-7.592l1.81-3.135a.5.5 0 1 0-.867-.5zM8.5 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm7 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM3 14.5h18v1c0 4.142-3.858 7.5-9 7.5s-9-3.358-9-7.5v-1z"/></svg>
+        <div>
+          Android
+          <div class="coming-soon">Coming Soon</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="redirect-msg" id="redirect-msg">Redirecting to the App Store...</p>
+  </div>
+
+  <div class="footer">
+    <a href="/privacy">Privacy</a> &nbsp;&middot;&nbsp; <a href="/terms">Terms</a> &nbsp;&middot;&nbsp; <a href="/help">Support</a>
+  </div>
+
+  <script>
+    var ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      document.getElementById('redirect-msg').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
