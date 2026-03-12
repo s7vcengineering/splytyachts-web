@@ -1,0 +1,52 @@
+name: Scrape Boatsetter Listings
+
+on:
+  schedule:
+    # Every 6 hours: midnight, 6 AM, noon, 6 PM UTC
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      city:
+        description: "Single city slug to scrape (leave empty for all cities)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run (no database writes)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          INPUT_CITY: ${{ inputs.city }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS="--verbose"
+
+          if [ -n "$INPUT_CITY" ]; then
+            ARGS="$ARGS --city $INPUT_CITY"
+          else
+            ARGS="$ARGS --all-cities"
+          fi
+
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          python3 scripts/scrape-boatsetter.py $ARGS
