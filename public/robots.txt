@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://splytyachts.com/sitemap.xml
+
+# Disallow mock/dev pages
+Disallow: /mock/

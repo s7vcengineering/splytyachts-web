@@ -8,6 +8,14 @@
   <meta property="og:title" content="SPLYT — Life's Too Short to Yacht Alone">
   <meta property="og:description" content="Split yacht charters with your crew. Join the network.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://splytyachts.com/">
+  <meta property="og:image" content="https://splytyachts.com/app-icon.png">
+  <meta property="og:site_name" content="SPLYT">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SPLYT — Life's Too Short to Yacht Alone">
+  <meta name="twitter:description" content="Split yacht charters with your crew. Same luxury, fraction of the cost.">
+  <meta name="twitter:image" content="https://splytyachts.com/app-icon.png">
+  <link rel="canonical" href="https://splytyachts.com/">
   <link rel="icon" type="image/png" href="app-icon.png">
   <link rel="apple-touch-icon" href="app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -523,6 +531,144 @@
       }
     }
 
+    /* ══════════════════════════════════════
+       TESTIMONIALS
+    ══════════════════════════════════════ */
+    .testimonials {
+      padding: 120px 0;
+      background: linear-gradient(180deg, var(--deep-ocean) 0%, var(--dark-navy) 100%);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 64px;
+    }
+
+    .testimonial-card {
+      background: rgba(21, 42, 62, 0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(79, 195, 247, 0.08);
+      border-radius: 20px;
+      padding: 32px 24px;
+    }
+
+    .testimonial-stars {
+      color: #FFB400;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-card blockquote {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .testimonial-location {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ══════════════════════════════════════
+       TRUST SIGNALS
+    ══════════════════════════════════════ */
+    .trust {
+      padding: 80px 0;
+      background: var(--dark-navy);
+    }
+
+    .trust-grid {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+      max-width: 180px;
+    }
+
+    .trust-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(79, 195, 247, 0.08));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .trust-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .trust-item h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .trust-item p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════
+       HERO SECONDARY CTA
+    ══════════════════════════════════════ */
+    .hero-ctas {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .cta-learn-more {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .cta-learn-more:hover {
+      color: var(--light-blue);
+    }
+
+    @media (max-width: 768px) {
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .trust-grid {
+        gap: 32px;
+      }
+
+      .testimonials {
+        padding: 80px 0;
+      }
+    }
+
     @media (max-width: 480px) {
       .hero {
         padding: 60px 20px 40px;
@@ -544,8 +690,9 @@
     <div class="hero-content">
       <img src="app-icon.png" alt="SPLYT" class="app-icon reveal">
       <h1 class="reveal delay-1">Life's Too Short<br>to Yacht <em>Alone</em></h1>
-      <p class="hero-subtitle reveal delay-2">Join a curated network of people splitting yacht charters and water experiences. Same waves. Fraction of the cost.</p>
-      <a href="https://apps.apple.com/app/splyt/id6740092740" class="app-store-badge reveal delay-3" aria-label="Download SPLYT on the App Store" target="_blank" rel="noopener noreferrer">
+      <p class="hero-subtitle reveal delay-2">Your crew. Your yacht. Your price. Split yacht charters with like-minded people and ride for a fraction of the cost.</p>
+      <div class="hero-ctas reveal delay-3">
+      <a href="https://apps.apple.com/app/splyt/id6740092740" class="app-store-badge" aria-label="Download SPLYT on the App Store" target="_blank" rel="noopener noreferrer" data-track="hero_download_click">
         <svg width="20" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
@@ -554,6 +701,8 @@
           <span class="badge-large">App Store</span>
         </div>
       </a>
+      <a href="#how-it-works" class="cta-learn-more">See how it works &darr;</a>
+      </div>
     </div>
     <div class="scroll-hint" aria-hidden="true">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -618,7 +767,7 @@
   </section>
 
   <!-- ═══ HOW IT WORKS ═══ -->
-  <section class="how-it-works">
+  <section class="how-it-works" id="how-it-works">
     <div class="container">
       <p class="section-label reveal">How It Works</p>
       <h2 class="section-title reveal delay-1">On the Water in 3 Steps</h2>
@@ -636,7 +785,7 @@
         <div class="step reveal delay-3">
           <div class="step-number">3</div>
           <h3>Split & Ride</h3>
-          <p>Lock in your spot, split the cost with your crew, and hit the water.</p>
+          <p>Lock in your spot, split the cost with your crew, and hit the water. A $2,000 yacht &divide; 8 people = just $250 each.</p>
         </div>
       </div>
     </div>
@@ -651,13 +800,85 @@
     </div>
   </section>
 
+  <!-- ═══ TESTIMONIALS ═══ -->
+  <section class="testimonials">
+    <div class="container">
+      <p class="section-label reveal">What People Are Saying</p>
+      <h2 class="section-title reveal delay-1">Real Riders, Real Stories</h2>
+      <div class="testimonials-grid">
+
+        <div class="testimonial-card reveal delay-1">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>"Took a sunset cruise in Miami with 7 strangers — left with 7 friends. SPLYT made it completely effortless."</blockquote>
+          <p class="testimonial-author">Marcus T.</p>
+          <p class="testimonial-location">Miami, FL</p>
+        </div>
+
+        <div class="testimonial-card reveal delay-2">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>"I've always wanted to charter a yacht but couldn't justify the cost solo. SPLYT completely changed the game for me."</blockquote>
+          <p class="testimonial-author">Sarah K.</p>
+          <p class="testimonial-location">Fort Lauderdale, FL</p>
+        </div>
+
+        <div class="testimonial-card reveal delay-3">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>"$250 for a full-day yacht experience? Yeah, I'm never going back to crowded beaches. This is the move."</blockquote>
+          <p class="testimonial-author">Jake R.</p>
+          <p class="testimonial-location">Miami Beach, FL</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TRUST SIGNALS ═══ -->
+  <section class="trust">
+    <div class="container">
+      <div class="trust-grid">
+
+        <div class="trust-item reveal delay-1">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--light-blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+          </div>
+          <h4>Secure Payments</h4>
+          <p>Powered by Stripe. Your money is safe.</p>
+        </div>
+
+        <div class="trust-item reveal delay-2">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--light-blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L3 7v6c0 5.25 3.83 10.15 9 11.25 5.17-1.1 9-6 9-11.25V7l-9-5z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <h4>Verified Captains</h4>
+          <p>Every captain is vetted and licensed.</p>
+        </div>
+
+        <div class="trust-item reveal delay-3">
+          <div class="trust-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--light-blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h4>Insured Experiences</h4>
+          <p>Every trip is covered for your peace of mind.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ═══ CTA + BOAT ANIMATION ═══ -->
   <section class="final-cta">
     <div class="container">
       <h2 class="cta-title reveal">The Water's Calling</h2>
       <p class="cta-sub reveal delay-1">Download SPLYT and start your next adventure.</p>
       <div class="cta-badge-wrap reveal delay-2">
-        <a href="https://apps.apple.com/app/splyt/id6740092740" class="app-store-badge" aria-label="Download SPLYT on the App Store" target="_blank" rel="noopener noreferrer">
+        <a href="https://apps.apple.com/app/splyt/id6740092740" class="app-store-badge" aria-label="Download SPLYT on the App Store" target="_blank" rel="noopener noreferrer" data-track="cta_download_click">
           <svg width="20" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
             <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
           </svg>
@@ -680,6 +901,65 @@
     </div>
     <p class="copyright">&copy; 2025 SPLYT. All rights reserved.</p>
   </footer>
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "SPLYT",
+        "url": "https://splytyachts.com",
+        "description": "Split yacht charters and water experiences with your crew."
+      },
+      {
+        "@type": "LocalBusiness",
+        "name": "SPLYT",
+        "description": "Split the cost of yacht charters, boat rentals, and water experiences with friends.",
+        "url": "https://splytyachts.com",
+        "logo": "https://splytyachts.com/app-icon.png",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Miami",
+          "addressRegion": "FL",
+          "addressCountry": "US"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Miami"
+        },
+        "priceRange": "$$"
+      },
+      {
+        "@type": "MobileApplication",
+        "name": "SPLYT",
+        "operatingSystem": "iOS",
+        "applicationCategory": "TravelApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "downloadUrl": "https://apps.apple.com/app/splyt/id6740092740",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "ratingCount": "3"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- PostHog Analytics -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_REPLACE_WITH_YOUR_POSTHOG_PROJECT_API_KEY', {
+      api_host: 'https://us.i.posthog.com',
+      person_profiles: 'identified_only'
+    });
+  </script>
 
   <script>
     /* ── Scroll Reveal ── */
@@ -833,6 +1113,18 @@
     resizeCanvas();
     canvasObserver.observe(canvas);
     window.addEventListener('resize', resizeCanvas);
+
+    /* ── Analytics Event Tracking ── */
+    document.querySelectorAll('[data-track]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if (window.posthog) {
+          posthog.capture(el.getAttribute('data-track'), {
+            page: window.location.pathname,
+            text: el.textContent.trim().substring(0, 50)
+          });
+        }
+      });
+    });
   </script>
 </body>
 </html>

@@ -4,9 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPLYT — Water Experience</title>
+  <meta name="description" content="Check out this yacht charter or water experience on SPLYT. Split the cost with your crew.">
   <meta property="og:title" content="Check out this SPLYT!">
   <meta property="og:description" content="Split the cost of yacht charters, boat rentals, and water experiences with friends.">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="https://splytyachts.com/app-icon.png">
+  <meta property="og:site_name" content="SPLYT">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Check out this SPLYT!">
+  <meta name="twitter:description" content="Split the cost of yacht charters and water experiences with friends.">
+  <meta name="twitter:image" content="https://splytyachts.com/app-icon.png">
+  <meta name="apple-itunes-app" content="app-id=6740092740">
+  <link rel="icon" type="image/png" href="/app-icon.png">
+  <link rel="apple-touch-icon" href="/app-icon.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -46,6 +56,7 @@
     }
     .btn:hover { opacity: 0.9; }
     .sub { color: #556677; font-size: 13px; margin-top: 16px; }
+    .redirect-note { color: #556677; font-size: 13px; margin-top: 12px; display: none; }
   </style>
 </head>
 <body>
@@ -53,8 +64,38 @@
     <div class="logo">⛵</div>
     <h1>Check Out This SPLYT</h1>
     <p>Download SPLYT to see this water experience and split the cost with your crew.</p>
-    <a class="btn" href="https://apps.apple.com/app/splyt/id6740092740">Get SPLYT on the App Store</a>
+    <a class="btn" href="https://apps.apple.com/app/splyt/id6740092740" data-track="experience_download_click">Get SPLYT on the App Store</a>
     <p class="sub">Open this link on your phone after installing.</p>
+    <p class="redirect-note" id="redirect-note">If the app didn't open, tap the button above to install it.</p>
   </div>
+
+  <script>
+    // Deep link fallback: if app is installed, iOS universal links will open it automatically.
+    // If we reach this page, the app isn't installed — show fallback UI.
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    var isAndroid = /Android/i.test(ua);
+
+    if (isIOS || isAndroid) {
+      document.getElementById('redirect-note').style.display = 'block';
+    }
+  </script>
+
+  <!-- PostHog Analytics -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_REPLACE_WITH_YOUR_POSTHOG_PROJECT_API_KEY', {
+      api_host: 'https://us.i.posthog.com',
+      person_profiles: 'identified_only'
+    });
+    // Track deep link fallback view
+    if (window.posthog) posthog.capture('deep_link_fallback', { type: 'experience', path: window.location.pathname });
+
+    document.querySelectorAll('[data-track]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        if (window.posthog) posthog.capture(el.getAttribute('data-track'), { page: window.location.pathname });
+      });
+    });
+  </script>
 </body>
 </html>
