@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe — Console — SPLYT</title>
+  <link rel="icon" type="image/png" href="/app-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --deep-ocean: #0A1628;
+      --dark-navy: #0D1F3C;
+      --light-blue: #4FC3F7;
+      --sea-blue: #2196F3;
+      --text-primary: #E8F0FE;
+      --text-secondary: #8EACCD;
+      --text-muted: #5A7A9A;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--deep-ocean);
+      color: var(--text-secondary);
+      -webkit-font-smoothing: antialiased;
+    }
+    .header { padding: 24px; text-align: center; border-bottom: 1px solid rgba(79, 195, 247, 0.08); }
+    .header a { color: var(--text-primary); text-decoration: none; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 700; }
+    .live-banner {
+      background: linear-gradient(90deg, rgba(103, 58, 183, 0.15), rgba(103, 58, 183, 0.08));
+      border: 1px solid rgba(103, 58, 183, 0.3);
+      color: #B39DDB;
+      text-align: center; padding: 10px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+    }
+    .live-banner.test-mode {
+      background: linear-gradient(90deg, rgba(255, 152, 0, 0.15), rgba(255, 152, 0, 0.08));
+      border-color: rgba(255, 152, 0, 0.3); color: #FFB74D;
+    }
+    .content { max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+    .breadcrumb { font-size: 13px; margin-bottom: 24px; }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--light-blue); }
+    .breadcrumb span { color: var(--text-muted); margin: 0 8px; }
+    .breadcrumb .current { color: var(--text-secondary); }
+    h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 36px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+    .summary-card { background: var(--dark-navy); border: 1px solid rgba(79, 195, 247, 0.1); border-radius: 12px; padding: 20px; }
+    .summary-card .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+    .summary-card .value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+    .summary-card .value.green { color: #81C784; }
+    .summary-card .value.blue { color: var(--light-blue); }
+    .summary-card .value.orange { color: #FFB74D; }
+    .summary-card .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .section { margin-bottom: 40px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section h2 { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .section-count { font-size: 12px; color: var(--text-muted); background: rgba(79, 195, 247, 0.08); padding: 4px 10px; border-radius: 20px; }
+    .breakdown-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .breakdown-card { background: var(--dark-navy); border: 1px solid rgba(79, 195, 247, 0.08); border-radius: 10px; padding: 16px; }
+    .breakdown-card .bc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+    .breakdown-card .bc-value { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .breakdown-card .bc-count { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(79, 195, 247, 0.1); }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    thead { background: var(--dark-navy); }
+    th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); border-bottom: 1px solid rgba(79, 195, 247, 0.1); }
+    td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid rgba(79, 195, 247, 0.05); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(79, 195, 247, 0.03); }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .badge-succeeded { background: rgba(76, 175, 80, 0.15); color: #81C784; }
+    .badge-requires_payment_method, .badge-requires_confirmation, .badge-requires_action { background: rgba(255, 152, 0, 0.15); color: #FFB74D; }
+    .badge-canceled { background: rgba(244, 67, 54, 0.15); color: #E57373; }
+    .badge-processing { background: rgba(33, 150, 243, 0.15); color: #64B5F6; }
+    .badge-deposit { background: rgba(33, 150, 243, 0.12); color: #64B5F6; }
+    .badge-premium { background: rgba(103, 58, 183, 0.15); color: #B39DDB; }
+    .badge-pledge { background: rgba(0, 150, 136, 0.15); color: #80CBC4; }
+    .badge-unknown { background: rgba(158, 158, 158, 0.15); color: #BDBDBD; }
+    .badge-enabled { background: rgba(76, 175, 80, 0.15); color: #81C784; }
+    .badge-disabled { background: rgba(244, 67, 54, 0.15); color: #E57373; }
+    .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--text-muted); }
+    .price { color: var(--light-blue); font-weight: 600; }
+    .empty-state { text-align: center; padding: 40px 24px; background: var(--dark-navy); border: 1px dashed rgba(79, 195, 247, 0.15); border-radius: 12px; color: var(--text-muted); }
+    .empty-state p { font-size: 14px; line-height: 1.6; }
+    #loading { text-align: center; padding: 80px 24px; color: var(--text-muted); }
+    .spinner { width: 32px; height: 32px; border: 3px solid rgba(79, 195, 247, 0.15); border-top-color: var(--light-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pm-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+    .pm-pill { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(79, 195, 247, 0.08); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+    footer { padding: 24px; text-align: center; border-top: 1px solid rgba(79, 195, 247, 0.06); }
+    .footer-links { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 12px; }
+    .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; }
+    .footer-links a:hover { color: var(--light-blue); }
+    .footer-links span { color: rgba(90,122,154,0.3); font-size: 13px; }
+    .copyright { font-size: 12px; color: rgba(90,122,154,0.5); }
+    @media (max-width: 900px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { h1 { font-size: 28px; } .content { padding: 32px 16px 64px; } .summary-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="header"><a href="/">SPLYT</a></div>
+  <div id="mode-banner" class="live-banner test-mode">Loading Stripe data...</div>
+
+  <div class="content">
+    <div class="breadcrumb">
+      <a href="/mock">Console</a><span>/</span><span class="current">Stripe</span>
+    </div>
+    <h1>Stripe Overview</h1>
+    <p class="subtitle">Live account balance, customers, payments, and Connect status.</p>
+
+    <div id="loading"><div class="spinner"></div>Fetching from Stripe API...</div>
+    <div id="error-state" style="display:none; text-align:center; padding:60px 24px; color:#E57373;"></div>
+
+    <div id="dashboard" style="display:none;">
+      <div class="summary-grid" id="summary-grid"></div>
+      <div class="section">
+        <div class="section-header"><h2>Payment Breakdown</h2></div>
+        <div class="breakdown-grid" id="type-breakdown"></div>
+        <div class="breakdown-grid" id="status-breakdown"></div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <h2>Customers</h2>
+          <span class="section-count" id="customer-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Customer ID</th><th>Name</th><th>Supabase User</th><th>Payment Method</th><th>Created</th></tr></thead>
+            <tbody id="customers-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <h2>Payment Intents</h2>
+          <span class="section-count" id="pi-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Amount</th><th>Type</th><th>Status</th><th>Customer</th><th>Methods</th><th>Date</th></tr></thead>
+            <tbody id="pi-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <h2>Connected Accounts (Stripe Connect)</h2>
+          <span class="section-count" id="connect-count"></span>
+        </div>
+        <div id="connect-content"></div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <h2>Transfers</h2>
+          <span class="section-count" id="transfer-count"></span>
+        </div>
+        <div id="transfer-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-links">
+      <a href="/">Home</a><span>&middot;</span>
+      <a href="/mock">Console</a><span>&middot;</span>
+      <a href="/privacy">Privacy Policy</a><span>&middot;</span>
+      <a href="/terms">Terms of Service</a>
+    </div>
+    <p class="copyright">&copy; 2025 SPLYT. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function fmt(cents) {
+      return '$' + (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function shortDate(ts) {
+      return new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function truncId(id) {
+      if (!id) return '\u2014';
+      return id.length > 20 ? id.slice(0, 20) + '...' : id;
+    }
+
+    function el(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text !== undefined) e.textContent = text;
+      return e;
+    }
+
+    function makeSummaryCard(label, value, colorClass, sub) {
+      var card = el('div', 'summary-card');
+      card.appendChild(el('div', 'label', label));
+      card.appendChild(el('div', 'value' + (colorClass ? ' ' + colorClass : ''), value));
+      card.appendChild(el('div', 'sub', sub));
+      return card;
+    }
+
+    function makeBreakdownCard(label, value, count) {
+      var card = el('div', 'breakdown-card');
+      card.appendChild(el('div', 'bc-label', label));
+      card.appendChild(el('div', 'bc-value', value));
+      card.appendChild(el('div', 'bc-count', count));
+      return card;
+    }
+
+    function makeBadge(text, badgeClass) {
+      return el('span', 'badge badge-' + badgeClass, text.replace(/_/g, ' '));
+    }
+
+    function makePill(text) {
+      return el('span', 'pm-pill', text);
+    }
+
+    function makeEmptyState(lines) {
+      var div = el('div', 'empty-state');
+      lines.forEach(function(line) { div.appendChild(el('p', null, line)); });
+      return div;
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get('token') || '';
+
+    fetch('/api/stripe/overview' + (token ? '?token=' + encodeURIComponent(token) : ''))
+      .then(function(r) {
+        if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || 'Failed to fetch'); });
+        return r.json();
+      })
+      .then(function(data) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        var banner = document.getElementById('mode-banner');
+        if (data.livemode) {
+          banner.className = 'live-banner';
+          banner.textContent = 'Live Mode \u2014 Real Stripe Data';
+        } else {
+          banner.className = 'live-banner test-mode';
+          banner.textContent = 'Test Mode \u2014 Stripe Test Data';
+        }
+
+        var custMap = {};
+        data.customers.list.forEach(function(c) { custMap[c.id] = c; });
+
+        var avail = data.balance.available.reduce(function(s, b) { return s + b.amount; }, 0);
+        var pending = data.balance.pending.reduce(function(s, b) { return s + b.amount; }, 0);
+        var succeeded = data.payment_intents.by_status.succeeded || { count: 0, total: 0 };
+        var connectReserved = (data.balance.connect_reserved || []).reduce(function(s, b) { return s + b.amount; }, 0);
+
+        var grid = document.getElementById('summary-grid');
+        grid.appendChild(makeSummaryCard('Available Balance', fmt(avail), 'green', 'Ready for payout'));
+        grid.appendChild(makeSummaryCard('Pending Balance', fmt(pending), 'orange', 'Processing'));
+        grid.appendChild(makeSummaryCard('Total Collected', fmt(succeeded.total), 'blue', succeeded.count + ' successful payments'));
+        grid.appendChild(makeSummaryCard('Connect Reserved', fmt(connectReserved), '', data.connected_accounts.count + ' connected accounts'));
+
+        var typeGrid = document.getElementById('type-breakdown');
+        Object.keys(data.payment_intents.by_type).forEach(function(type) {
+          var info = data.payment_intents.by_type[type];
+          typeGrid.appendChild(makeBreakdownCard(type, fmt(info.total), info.count + ' payments'));
+        });
+
+        var statusGrid = document.getElementById('status-breakdown');
+        Object.keys(data.payment_intents.by_status).forEach(function(status) {
+          var info = data.payment_intents.by_status[status];
+          statusGrid.appendChild(makeBreakdownCard(status.replace(/_/g, ' '), fmt(info.total), info.count + ' payments'));
+        });
+
+        document.getElementById('customer-count').textContent = data.customers.count + ' customers';
+        var custBody = document.getElementById('customers-body');
+        data.customers.list.forEach(function(c) {
+          var tr = document.createElement('tr');
+          var userId = (c.metadata && c.metadata.supabase_user_id) || '\u2014';
+          var shortUser = userId.length > 12 ? userId.slice(0, 8) + '...' : userId;
+
+          var td1 = el('td', 'mono', truncId(c.id));
+          var td2 = el('td', null, c.name || 'unnamed');
+          if (!c.name) td2.style.color = 'var(--text-muted)';
+          var td3 = el('td', 'mono', shortUser);
+          td3.title = userId;
+          var td4 = el('td', 'mono', c.default_payment_method ? truncId(c.default_payment_method) : '\u2014');
+          var td5 = el('td', null, shortDate(c.created));
+
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tr.appendChild(td3);
+          tr.appendChild(td4);
+          tr.appendChild(td5);
+          custBody.appendChild(tr);
+        });
+
+        document.getElementById('pi-count').textContent = data.payment_intents.count + ' payments';
+        var piBody = document.getElementById('pi-body');
+        data.payment_intents.list.forEach(function(pi) {
+          var tr = document.createElement('tr');
+          var cust = custMap[pi.customer];
+          var custLabel = cust ? (cust.name || truncId(pi.customer)) : truncId(pi.customer);
+
+          tr.appendChild(el('td', 'mono', truncId(pi.id)));
+          tr.appendChild(el('td', 'price', fmt(pi.amount)));
+
+          var tdType = document.createElement('td');
+          tdType.appendChild(makeBadge(pi.type, pi.type));
+          tr.appendChild(tdType);
+
+          var tdStatus = document.createElement('td');
+          tdStatus.appendChild(makeBadge(pi.status, pi.status));
+          tr.appendChild(tdStatus);
+
+          tr.appendChild(el('td', null, custLabel));
+
+          var tdMethods = document.createElement('td');
+          var pillsDiv = el('div', 'pm-pills');
+          var methods = (pi.payment_method_types || []).slice(0, 4);
+          methods.forEach(function(m) { pillsDiv.appendChild(makePill(m)); });
+          if ((pi.payment_method_types || []).length > 4) {
+            pillsDiv.appendChild(makePill('+' + (pi.payment_method_types.length - 4)));
+          }
+          tdMethods.appendChild(pillsDiv);
+          tr.appendChild(tdMethods);
+
+          tr.appendChild(el('td', null, shortDate(pi.created)));
+          piBody.appendChild(tr);
+        });
+
+        document.getElementById('connect-count').textContent = data.connected_accounts.count + ' accounts';
+        var connectDiv = document.getElementById('connect-content');
+        if (data.connected_accounts.count === 0) {
+          connectDiv.appendChild(makeEmptyState([
+            'No connected accounts yet.',
+            'Stripe Connect onboarding has not been set up.',
+            'This is required for people-as-wallets and captain payouts.'
+          ]));
+        } else {
+          var wrap = el('div', 'table-wrap');
+          var tbl = document.createElement('table');
+          var thead = document.createElement('thead');
+          var headRow = document.createElement('tr');
+          ['Account ID', 'Type', 'Email', 'Charges', 'Payouts', 'Created'].forEach(function(h) {
+            headRow.appendChild(el('th', null, h));
+          });
+          thead.appendChild(headRow);
+          tbl.appendChild(thead);
+          var tbody = document.createElement('tbody');
+          data.connected_accounts.list.forEach(function(a) {
+            var row = document.createElement('tr');
+            row.appendChild(el('td', 'mono', truncId(a.id)));
+            row.appendChild(el('td', null, a.type || '\u2014'));
+            row.appendChild(el('td', null, a.email || '\u2014'));
+            var tdCharges = document.createElement('td');
+            tdCharges.appendChild(makeBadge(a.charges_enabled ? 'enabled' : 'disabled', a.charges_enabled ? 'enabled' : 'disabled'));
+            row.appendChild(tdCharges);
+            var tdPayouts = document.createElement('td');
+            tdPayouts.appendChild(makeBadge(a.payouts_enabled ? 'enabled' : 'disabled', a.payouts_enabled ? 'enabled' : 'disabled'));
+            row.appendChild(tdPayouts);
+            row.appendChild(el('td', null, shortDate(a.created)));
+            tbody.appendChild(row);
+          });
+          tbl.appendChild(tbody);
+          wrap.appendChild(tbl);
+          connectDiv.appendChild(wrap);
+        }
+
+        document.getElementById('transfer-count').textContent = data.transfers.count + ' transfers';
+        var transferDiv = document.getElementById('transfer-content');
+        if (data.transfers.count === 0) {
+          transferDiv.appendChild(makeEmptyState([
+            'No transfers yet.',
+            'Transfers move funds to connected accounts (captain payouts, user wallets).',
+            'Requires Stripe Connect to be configured first.'
+          ]));
+        } else {
+          var wrap2 = el('div', 'table-wrap');
+          var tbl2 = document.createElement('table');
+          var thead2 = document.createElement('thead');
+          var headRow2 = document.createElement('tr');
+          ['Transfer ID', 'Amount', 'Destination', 'Date'].forEach(function(h) {
+            headRow2.appendChild(el('th', null, h));
+          });
+          thead2.appendChild(headRow2);
+          tbl2.appendChild(thead2);
+          var tbody2 = document.createElement('tbody');
+          data.transfers.list.forEach(function(t) {
+            var row = document.createElement('tr');
+            row.appendChild(el('td', 'mono', truncId(t.id)));
+            row.appendChild(el('td', 'price', fmt(t.amount)));
+            row.appendChild(el('td', 'mono', truncId(t.destination)));
+            row.appendChild(el('td', null, shortDate(t.created)));
+            tbody2.appendChild(row);
+          });
+          tbl2.appendChild(tbody2);
+          wrap2.appendChild(tbl2);
+          transferDiv.appendChild(wrap2);
+        }
+      })
+      .catch(function(err) {
+        document.getElementById('loading').style.display = 'none';
+        var errDiv = document.getElementById('error-state');
+        errDiv.style.display = 'block';
+        errDiv.appendChild(el('p', null, 'Failed to load Stripe data'));
+        var detail = el('p', null, err.message);
+        detail.style.fontSize = '13px';
+        detail.style.marginTop = '8px';
+        detail.style.color = 'var(--text-muted)';
+        errDiv.appendChild(detail);
+        var hint = el('p', null, 'Make sure STRIPE_SECRET_KEY is set in your environment and pass ?token=YOUR_CRON_SECRET in the URL.');
+        hint.style.fontSize = '12px';
+        hint.style.marginTop = '16px';
+        hint.style.color = 'var(--text-muted)';
+        errDiv.appendChild(hint);
+      });
+  </script>
+</body>
+</html>

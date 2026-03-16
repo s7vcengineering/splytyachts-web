@@ -52,10 +52,17 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/mock", "destination": "/mock/index.html" },
+    { "source": "/mock/stripe", "destination": "/mock/stripe.html" },
     { "source": "/mock/agent-logs", "destination": "/mock/agent-logs.html" },
     { "source": "/mock/bookings", "destination": "/mock/bookings.html" },
     { "source": "/mock/experiences", "destination": "/mock/experiences.html" },
     { "source": "/mock/captain-schedule", "destination": "/mock/captain-schedule.html" },
     { "source": "/mock/captain", "destination": "/mock/captain.html" }
+  ],
+  "crons": [
+    {
+      "path": "/api/post-daily",
+      "schedule": "0 15 * * *"
+    }
   ]
 }
