@@ -1,71 +1,151 @@
 import { createServiceClient } from "@/lib/supabase";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn, formatCity } from "@/lib/utils";
+import Link from "next/link";
+import { MansionsFilter } from "./mansions-filter";
 
 export const dynamic = "force-dynamic";
 
-async function getData() {
-  const supabase = createServiceClient();
-  const { data, count } = await supabase
-    .from("mansions")
-    .select("*", { count: "exact" })
-    .eq("is_active", true)
-    .order("capacity", { ascending: false, nullsFirst: false })
-    .limit(50);
+const PER_PAGE = 20;
 
-  return { mansions: data || [], total: count || 0 };
+interface Props {
+  searchParams: Promise<Record<string, string | undefined>>;
 }
 
-export default async function MansionsPage() {
-  const { mansions, total } = await getData();
+async function getData(params: Record<string, string | undefined>) {
+  const supabase = createServiceClient();
+
+  let query = supabase
+    .from("mansions")
+    .select("*", { count: "exact" })
+    .eq("is_active", true);
+
+  if (params.q)
+    query = query.or(`name.ilike.%${params.q}%,location.ilike.%${params.q}%`);
+  if (params.city) query = query.eq("city", params.city);
+  if (params.min_beds)
+    query = query.gte("bedrooms", parseInt(params.min_beds));
+  if (params.min_guests)
+    query = query.gte("capacity", parseInt(params.min_guests));
+
+  const sort = params.sort || "capacity";
+  switch (sort) {
+    case "price_asc":
+      query = query.order("nightly_rate", {
+        ascending: true,
+        nullsFirst: false,
+      });
+      break;
+    case "price_desc":
+      query = query.order("nightly_rate", {
+        ascending: false,
+        nullsFirst: false,
+      });
+      break;
+    case "bedrooms":
+      query = query.order("bedrooms", {
+        ascending: false,
+        nullsFirst: false,
+      });
+      break;
+    default:
+      query = query.order("capacity", {
+        ascending: false,
+        nullsFirst: false,
+      });
+  }
+
+  const page = parseInt(params.page || "1");
+  const from = (page - 1) * PER_PAGE;
+  const to = from + PER_PAGE - 1;
+  query = query.range(from, to);
+
+  const { data, count } = await query;
+  return { mansions: data || [], total: count || 0, page };
+}
+
+async function getCities() {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("mansions")
+    .select("city")
+    .eq("is_active", true)
+    .not("city", "is", null);
+
+  const unique = [
+    ...new Set(
+      (data || []).map((d) => (d as Record<string, unknown>).city as string),
+    ),
+  ]
+    .filter(Boolean)
+    .sort();
+  return unique;
+}
+
+export default async function MansionsPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const [{ mansions, total, page }, cities] = await Promise.all([
+    getData(params),
+    getCities(),
+  ]);
+
+  const totalPages = Math.ceil(total / PER_PAGE);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div>
+        <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold text-white">Mansions</h2>
-          <p className="text-ocean-400 text-sm mt-1">
-            {total} properties from MVP Miami
-          </p>
+          <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400">
+            {total} properties
+          </span>
         </div>
-        <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400">
+        <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-ocean-800 text-ocean-300">
           mvpmiami.com
         </span>
       </div>
 
+      <MansionsFilter cities={cities} />
+
       {mansions.length === 0 ? (
-        <div className="bg-ocean-900 rounded-xl border border-ocean-700 p-12 text-center">
+        <div className="bg-ocean-900 rounded-xl border border-ocean-700 p-12 text-center mt-6">
           <p className="text-ocean-400 font-medium">
-            No mansions scraped yet
-          </p>
-          <p className="text-ocean-500 text-sm mt-1">
-            Run: python3 scripts/scrape-mvpmiami.py --type mansions
+            No mansions match your filters
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           {mansions.map((mansion: Record<string, unknown>) => {
             const rawPhotos = (mansion.photo_urls as string[]) || [];
             const photos = rawPhotos.filter(
-              (url) => !url.includes("MVP_MIAMI") && !url.includes("mvp-logo") && !url.includes("favicon"),
+              (url) =>
+                !url.includes("MVP_MIAMI") &&
+                !url.includes("mvp-logo") &&
+                !url.includes("favicon"),
             );
             const amenities = (mansion.amenities as string[]) || [];
 
             return (
               <div
                 key={mansion.id as string}
-                className="bg-ocean-900 rounded-xl border border-ocean-700 overflow-hidden hover:border-ocean-600 transition-colors"
+                className="bg-ocean-900 rounded-xl border border-ocean-700 overflow-hidden hover:border-ocean-500 transition-colors group"
               >
                 {photos.length > 0 ? (
                   <div className="aspect-[16/9] bg-ocean-950 overflow-hidden">
                     <img
                       src={photos[0]}
                       alt={mansion.name as string}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                 ) : (
                   <div className="aspect-[16/9] bg-ocean-950 flex items-center justify-center">
-                    <span className="text-3xl">🏠</span>
+                    <svg
+                      className="w-12 h-12 text-ocean-600"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 3L4 9v12h16V9l-8-6zm6 16h-3v-6H9v6H6v-9l6-4.5 6 4.5v9z" />
+                    </svg>
                   </div>
                 )}
 
@@ -174,6 +254,70 @@ export default async function MansionsPage() {
           })}
         </div>
       )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {page > 1 && (
+            <PaginationLink page={page - 1} params={params} label="Previous" />
+          )}
+          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+            let p: number;
+            if (totalPages <= 7) {
+              p = i + 1;
+            } else if (page <= 4) {
+              p = i + 1;
+            } else if (page >= totalPages - 3) {
+              p = totalPages - 6 + i;
+            } else {
+              p = page - 3 + i;
+            }
+            return (
+              <PaginationLink
+                key={p}
+                page={p}
+                params={params}
+                label={String(p)}
+                active={p === page}
+              />
+            );
+          })}
+          {page < totalPages && (
+            <PaginationLink page={page + 1} params={params} label="Next" />
+          )}
+        </div>
+      )}
     </div>
+  );
+}
+
+function PaginationLink({
+  page,
+  params,
+  label,
+  active,
+}: {
+  page: number;
+  params: Record<string, string | undefined>;
+  label: string;
+  active?: boolean;
+}) {
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v && k !== "page") sp.set(k, v);
+  }
+  sp.set("page", String(page));
+
+  return (
+    <Link
+      href={`/mansions?${sp.toString()}`}
+      className={cn(
+        "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+        active
+          ? "bg-ocean-600 text-white"
+          : "bg-ocean-800 text-ocean-300 hover:bg-ocean-700 hover:text-white",
+      )}
+    >
+      {label}
+    </Link>
   );
 }
