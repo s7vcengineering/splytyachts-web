@@ -128,12 +128,12 @@ export default async function AirbnbStaysPage({ searchParams }: Props) {
                     </svg>
                   </div>
                 )}
-                {stay.is_superhost && (
+                {(stay.is_superhost as boolean) && (
                   <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white text-black">
                     Superhost
                   </span>
                 )}
-                {badges.length > 0 && !stay.is_superhost && (
+                {badges.length > 0 && !(stay.is_superhost as boolean) && (
                   <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white text-black">
                     {badges[0]}
                   </span>
