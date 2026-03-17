@@ -1,0 +1,53 @@
+name: Scrape MVP Miami Listings
+
+on:
+  schedule:
+    # Once daily at 5 AM UTC (1 AM EST)
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      type:
+        description: "Type to scrape: cars, mansions, yachts, or all"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - cars
+          - mansions
+          - yachts
+      dry_run:
+        description: "Dry run (no database writes)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          INPUT_TYPE: ${{ inputs.type || 'all' }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS="--type $INPUT_TYPE"
+
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          python3 scripts/scrape-mvpmiami.py $ARGS

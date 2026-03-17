@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D1F3C"/>
+      <stop offset="100%" stop-color="#0A1628"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4FC3F7"/>
+      <stop offset="100%" stop-color="#2196F3"/>
+    </linearGradient>
+    <linearGradient id="dollar" x1="48" y1="28" x2="72" y2="92" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#81C784"/>
+      <stop offset="100%" stop-color="#4CAF50"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="60" cy="60" r="60" fill="url(#bg)"/>
+  <circle cx="60" cy="60" r="46" stroke="url(#ring)" stroke-width="2" opacity="0.3"/>
+  <circle cx="60" cy="60" r="38" stroke="url(#ring)" stroke-width="1" opacity="0.15"/>
+  <!-- Network nodes -->
+  <circle cx="60" cy="22" r="3" fill="#4FC3F7" opacity="0.5"/>
+  <circle cx="93" cy="41" r="3" fill="#4FC3F7" opacity="0.5"/>
+  <circle cx="93" cy="79" r="3" fill="#4FC3F7" opacity="0.5"/>
+  <circle cx="60" cy="98" r="3" fill="#4FC3F7" opacity="0.5"/>
+  <circle cx="27" cy="79" r="3" fill="#4FC3F7" opacity="0.5"/>
+  <circle cx="27" cy="41" r="3" fill="#4FC3F7" opacity="0.5"/>
+  <!-- Network lines -->
+  <line x1="60" y1="22" x2="60" y2="40" stroke="#4FC3F7" stroke-width="0.5" opacity="0.2"/>
+  <line x1="93" y1="41" x2="78" y2="50" stroke="#4FC3F7" stroke-width="0.5" opacity="0.2"/>
+  <line x1="93" y1="79" x2="78" y2="70" stroke="#4FC3F7" stroke-width="0.5" opacity="0.2"/>
+  <line x1="60" y1="98" x2="60" y2="80" stroke="#4FC3F7" stroke-width="0.5" opacity="0.2"/>
+  <line x1="27" y1="79" x2="42" y2="70" stroke="#4FC3F7" stroke-width="0.5" opacity="0.2"/>
+  <line x1="27" y1="41" x2="42" y2="50" stroke="#4FC3F7" stroke-width="0.5" opacity="0.2"/>
+  <!-- Central dollar sign -->
+  <g filter="url(#glow)">
+    <circle cx="60" cy="60" r="22" fill="#0D1F3C" stroke="url(#ring)" stroke-width="1.5"/>
+    <text x="60" y="68" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="url(#dollar)">$</text>
+  </g>
+  <!-- Small particle dots on lines -->
+  <circle cx="60" cy="32" r="1.5" fill="#81C784" opacity="0.7"/>
+  <circle cx="85" cy="46" r="1.5" fill="#81C784" opacity="0.7"/>
+  <circle cx="85" cy="74" r="1.5" fill="#81C784" opacity="0.7"/>
+  <circle cx="60" cy="88" r="1.5" fill="#81C784" opacity="0.7"/>
+  <circle cx="35" cy="74" r="1.5" fill="#81C784" opacity="0.7"/>
+  <circle cx="35" cy="46" r="1.5" fill="#81C784" opacity="0.7"/>
+</svg>

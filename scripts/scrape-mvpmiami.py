@@ -204,7 +204,7 @@ def parse_car_listing(url, html_content):
         "contact_address": ADDRESS,
         "is_active": True,
         "scrape_status": "scraped",
-        "last_scraped_at": datetime.datetime.now(datetime.UTC).isoformat() + "Z",
+        "last_scraped_at": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
     # Extract from URL slug: "2024-rolls-royce-cullinan-c-4"
@@ -383,7 +383,7 @@ def parse_mansion_listing(url, html_content):
         "contact_phone": PHONE,
         "is_active": True,
         "scrape_status": "scraped",
-        "last_scraped_at": datetime.datetime.now(datetime.UTC).isoformat() + "Z",
+        "last_scraped_at": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
     slug = url.rstrip("/").split("/")[-1]
@@ -452,16 +452,19 @@ def parse_mansion_listing(url, html_content):
 
     # Extract images
     image_urls = []
+    # Skip known logos and site assets
+    SKIP_IMAGES = {"MVP_MIAMI.png", "mvp-logo", "favicon", "site-logo"}
     wp_matches = re.findall(
         r'(?:src|data-src|href)=["\']([^"\']*wp-content/uploads[^"\']*\.(?:jpg|jpeg|png|webp))["\']',
         html_content, re.IGNORECASE
     )
     for img_url in wp_matches:
         full_url = img_url if img_url.startswith("http") else BASE_URL + img_url
-        # Skip thumbnails
+        # Skip thumbnails and logos
         if "150x" not in full_url and "300x" not in full_url and "-min" not in full_url:
-            if full_url not in image_urls:
-                image_urls.append(full_url)
+            if not any(skip in full_url for skip in SKIP_IMAGES):
+                if full_url not in image_urls:
+                    image_urls.append(full_url)
     data["photo_urls"] = image_urls[:50]
 
     # Extract price
@@ -489,7 +492,7 @@ def parse_yacht_listing(url, html_content):
         "contact_phone": PHONE,
         "is_active": True,
         "scrape_status": "scraped",
-        "last_scraped_at": datetime.datetime.now(datetime.UTC).isoformat() + "Z",
+        "last_scraped_at": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
     slug = url.rstrip("/").split("/")[-1]
@@ -561,19 +564,18 @@ def parse_yacht_listing(url, html_content):
 # Supabase upsert
 # ---------------------------------------------------------------------------
 
-def supabase_upsert(supabase_url, supabase_key, table, data, conflict_key="source_listing_id"):
+def supabase_upsert(supabase_url, supabase_key, table, data, conflict_key="source_provider,source_listing_id"):
     """Upsert a record into Supabase."""
-    url = f"{supabase_url}/rest/v1/{table}"
+    url = f"{supabase_url}/rest/v1/{table}?on_conflict={conflict_key}"
     headers = {
         "apikey": supabase_key,
         "Authorization": f"Bearer {supabase_key}",
         "Content-Type": "application/json",
-        "Prefer": f"resolution=merge-duplicates",
+        "Prefer": "resolution=merge-duplicates",
     }
 
-    # Add ID if new record
-    if "id" not in data:
-        data["id"] = str(uuid.uuid4())
+    # Don't send id on upsert — let DB keep existing id or generate new one
+    data.pop("id", None)
 
     body = json.dumps(data, default=str).encode("utf-8")
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")

@@ -18,8 +18,6 @@ const FORMATS: Record<Format, { width: number; height: number }> = {
  * Query params:
  *   - id:     Supabase boat listing ID (fetches from `boats` table)
  *   - format: "feed" (1080x1350), "story" (1080x1920), "square" (1080x1080)
- *
- * If no `id` is provided, renders a generic branded card using static content.
  */
 export default async function handler(req: Request) {
   const url = new URL(req.url);
@@ -37,6 +35,7 @@ export default async function handler(req: Request) {
   let features: string[] = ["Champagne", "DJ", "Swimming"];
   let hostName = "Captain Rivera";
   let lengthFt = 60;
+  let photoUrl = "";
 
   // If an ID is provided, fetch the real listing from Supabase
   if (id) {
@@ -57,8 +56,6 @@ export default async function handler(req: Request) {
         const boats = await resp.json();
         if (Array.isArray(boats) && boats.length > 0) {
           const boat = boats[0];
-          // Columns: name, type, hourly_rate, city, capacity, rating,
-          //          length_ft, features, amenities, captain_name, make, model
           title = boat.name || title;
           city = boat.city || city;
           if (boat.hourly_rate) {
@@ -73,6 +70,12 @@ export default async function handler(req: Request) {
           boatType = boat.type || boatType;
           lengthFt = boat.length_ft || lengthFt;
           hostName = boat.captain_name || hostName;
+          if (
+            Array.isArray(boat.photo_urls) &&
+            boat.photo_urls.length > 0
+          ) {
+            photoUrl = boat.photo_urls[0];
+          }
           if (
             Array.isArray(boat.features) &&
             boat.features.length > 0
@@ -91,23 +94,22 @@ export default async function handler(req: Request) {
     }
   }
 
-  // Also allow query-param overrides for testing / manual card generation
+  // Query-param overrides
   title = url.searchParams.get("title") || title;
   city = url.searchParams.get("city") || city;
   if (url.searchParams.get("price"))
     pricePerHour = parseInt(url.searchParams.get("price")!);
+  if (url.searchParams.get("photo"))
+    photoUrl = url.searchParams.get("photo")!;
 
   const W = dims.width;
   const H = dims.height;
   const isStory = format === "story";
   const isSquare = format === "square";
-  const pad = 56;
 
-  // Split cost calculation
   const splitGuests = 8;
-  const splitPrice = Math.round(
-    (pricePerHour * 4) / splitGuests
-  ); // 4-hour charter split
+  const splitPrice = Math.round((pricePerHour * 4) / splitGuests);
+  const appIconUrl = "https://splytpayments.com/app-icon.png";
 
   return new ImageResponse(
     (
@@ -120,81 +122,99 @@ export default async function handler(req: Request) {
           fontFamily: "system-ui, -apple-system, sans-serif",
           position: "relative",
           overflow: "hidden",
-          background: "linear-gradient(180deg, #0A1628 0%, #0D1F3C 50%, #102A4C 100%)",
+          backgroundColor: "#050E1A",
         }}
       >
-        {/* Top accent bar */}
+        {/* ===== FULL-BLEED HERO IMAGE ===== */}
+        {photoUrl ? (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: W,
+              height: H,
+              display: "flex",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoUrl}
+              alt=""
+              width={W}
+              height={H}
+              style={{ objectFit: "cover", width: "100%", height: "100%" }}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: W,
+              height: H,
+              display: "flex",
+              background:
+                "linear-gradient(165deg, #0A2540 0%, #0D1F3C 40%, #061728 100%)",
+            }}
+          />
+        )}
+
+        {/* ===== GRADIENT OVERLAYS ===== */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
-            height: 5,
-            background: "linear-gradient(90deg, #2196F3, #4FC3F7)",
-            display: "flex",
-          }}
-        />
-
-        {/* Ambient glow effects */}
-        <div
-          style={{
-            position: "absolute",
-            top: "10%",
-            left: "10%",
-            width: 400,
-            height: 400,
-            borderRadius: "50%",
-            background: "rgba(33, 150, 243, 0.06)",
-            filter: "blur(80px)",
+            height: Math.round(H * 0.25),
+            background: photoUrl
+              ? "linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)"
+              : "transparent",
             display: "flex",
           }}
         />
         <div
           style={{
             position: "absolute",
-            bottom: "20%",
-            right: "5%",
-            width: 300,
-            height: 300,
-            borderRadius: "50%",
-            background: "rgba(79, 195, 247, 0.04)",
-            filter: "blur(60px)",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: Math.round(H * (isStory ? 0.5 : 0.58)),
+            background: photoUrl
+              ? "linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.8) 40%, rgba(0,0,0,0.3) 75%, transparent 100%)"
+              : "linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%)",
             display: "flex",
           }}
         />
 
-        {/* Header: SPLYT brand + type badge */}
+        {/* ===== TOP BAR: Brand + Location ===== */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: `${pad}px ${pad}px 0 ${pad}px`,
+            padding: "48px 52px 0 52px",
+            position: "relative",
+            zIndex: 10,
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                background: "linear-gradient(135deg, #2196F3, #4FC3F7)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 24,
-                color: "#fff",
-              }}
-            >
-              S
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={appIconUrl}
+              alt=""
+              width={44}
+              height={44}
+              style={{ borderRadius: 12 }}
+            />
             <span
               style={{
                 fontSize: 26,
-                fontWeight: 700,
-                color: "#8EACCD",
-                letterSpacing: "-0.02em",
+                fontWeight: 800,
+                color: "#fff",
+                letterSpacing: "0.06em",
               }}
             >
               SPLYT
@@ -206,354 +226,417 @@ export default async function handler(req: Request) {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              backgroundColor: "rgba(33, 150, 243, 0.12)",
-              borderRadius: 20,
-              padding: "8px 18px",
-              border: "1px solid rgba(79, 195, 247, 0.15)",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              borderRadius: 100,
+              padding: "10px 22px",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            <div
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                backgroundColor: "#4FC3F7",
-                display: "flex",
-              }}
-            />
+            <span style={{ fontSize: 14, color: "#fff" }}>{"\u2693"}</span>
             <span
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 700,
-                color: "#4FC3F7",
-                letterSpacing: "0.08em",
-              }}
-            >
-              EXPERIENCE
-            </span>
-          </div>
-        </div>
-
-        {/* Yacht visual area with wave decoration */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: `${isStory ? 48 : 36}px ${pad}px`,
-            position: "relative",
-          }}
-        >
-          {/* Large sailboat icon */}
-          <div
-            style={{
-              width: isStory ? 220 : isSquare ? 160 : 200,
-              height: isStory ? 220 : isSquare ? 160 : 200,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: isStory ? 140 : isSquare ? 100 : 120,
-              marginBottom: 24,
-            }}
-          >
-            <svg
-              width={isStory ? 200 : isSquare ? 140 : 180}
-              height={isStory ? 200 : isSquare ? 140 : 180}
-              viewBox="0 0 200 200"
-            >
-              {/* Water waves */}
-              <path
-                d="M0 140 Q25 130 50 140 Q75 150 100 140 Q125 130 150 140 Q175 150 200 140 L200 200 L0 200 Z"
-                fill="rgba(33, 150, 243, 0.3)"
-              />
-              <path
-                d="M0 155 Q30 145 60 155 Q90 165 120 155 Q150 145 180 155 Q195 160 200 155 L200 200 L0 200 Z"
-                fill="rgba(33, 150, 243, 0.15)"
-              />
-              {/* Hull */}
-              <path
-                d="M55 140 Q60 165 100 165 Q140 165 145 140 Z"
-                fill="#4FC3F7"
-              />
-              {/* Mast */}
-              <line
-                x1="100"
-                y1="45"
-                x2="100"
-                y2="140"
-                stroke="#E8F0FE"
-                strokeWidth="3"
-              />
-              {/* Main sail */}
-              <path
-                d="M103 48 Q145 85 138 137 L103 137 Z"
-                fill="rgba(129, 212, 250, 0.7)"
-              />
-              {/* Jib */}
-              <path
-                d="M97 55 Q65 95 68 137 L97 137 Z"
-                fill="rgba(179, 229, 252, 0.5)"
-              />
-            </svg>
-          </div>
-
-          {/* City label */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
-            <span style={{ fontSize: 16, color: "#5A7A9A" }}>
-              {"\u2693"}
-            </span>
-            <span
-              style={{
-                fontSize: 16,
-                fontWeight: 600,
-                color: "#5A7A9A",
-                letterSpacing: "0.15em",
+                color: "#fff",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
               }}
             >
               {city}
             </span>
           </div>
-
-          {/* Boat type & length */}
-          <span
-            style={{
-              fontSize: 15,
-              color: "#5A7A9A",
-              fontWeight: 500,
-              marginBottom: 4,
-            }}
-          >
-            {boatType} {"\u00B7"} {lengthFt}ft {"\u00B7"} Up to {capacity}{" "}
-            guests
-          </span>
         </div>
 
-        {/* Divider */}
+        {/* ===== BOTTOM CONTENT ===== */}
         <div
           style={{
-            margin: `0 ${pad}px`,
-            height: 1,
-            background:
-              "linear-gradient(90deg, transparent, rgba(79, 195, 247, 0.2), transparent)",
-            display: "flex",
-          }}
-        />
-
-        {/* Main content area */}
-        <div
-          style={{
-            flex: 1,
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
-            padding: `0 ${pad}px`,
-            gap: isStory ? 36 : isSquare ? 20 : 28,
+            padding: isStory ? "0 52px 64px" : "0 52px 52px",
+            gap: isStory ? 28 : 24,
+            zIndex: 10,
           }}
         >
-          {/* Experience title */}
+          {/* Details line */}
           <div
             style={{
-              fontSize: isStory ? 52 : isSquare ? 36 : 46,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.6)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {boatType}
+            </span>
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.3)" }}>
+              {"\u00B7"}
+            </span>
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.6)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {lengthFt}FT
+            </span>
+            <span style={{ fontSize: 14, color: "rgba(255,255,255,0.3)" }}>
+              {"\u00B7"}
+            </span>
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.6)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              UP TO {capacity} GUESTS
+            </span>
+            {rating > 0 && (
+              <>
+                <span
+                  style={{ fontSize: 14, color: "rgba(255,255,255,0.3)" }}
+                >
+                  {"\u00B7"}
+                </span>
+                <span style={{ fontSize: 14, color: "#FFB400" }}>
+                  {"\u2605"}
+                </span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "#fff",
+                  }}
+                >
+                  {rating.toFixed(1)}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Title */}
+          <div
+            style={{
+              fontSize: isStory ? 46 : isSquare ? 36 : 42,
               fontWeight: 700,
-              lineHeight: 1.15,
-              color: "#E8F0FE",
+              lineHeight: 1.1,
+              color: "#fff",
               display: "flex",
               flexWrap: "wrap",
               letterSpacing: "-0.02em",
             }}
           >
-            {title.length > 60 ? title.slice(0, 57) + "..." : title}
+            {title.length > 55 ? title.slice(0, 52) + "..." : title}
           </div>
 
-          {/* Host + Rating */}
+          {/* Host */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 16,
+              gap: 10,
+            }}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08))",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 16,
+                color: "#fff",
+                fontWeight: 700,
+              }}
+            >
+              {hostName.charAt(0)}
+            </div>
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.7)",
+              }}
+            >
+              Hosted by {hostName}
+            </span>
+          </div>
+
+          {/* Feature tags */}
+          {features.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {features.map((feature, i) => (
+                <div
+                  key={i}
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    borderRadius: 100,
+                    padding: "6px 16px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: "rgba(255,255,255,0.7)",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ===== HERO PRICING ===== */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 20,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: 4,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: isStory ? 80 : isSquare ? 64 : 74,
+                  fontWeight: 800,
+                  color: "#fff",
+                  lineHeight: 0.9,
+                  letterSpacing: "-0.03em",
+                }}
+              >
+                ${splitPrice}
+              </span>
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.5)",
+                  marginBottom: 6,
+                }}
+              >
+                /person
+              </span>
+            </div>
+          </div>
+
+          {/* Total context */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginTop: -8,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 16,
+                color: "rgba(255,255,255,0.4)",
+                fontWeight: 500,
+                textDecoration: "line-through",
+                textDecorationColor: "rgba(255,255,255,0.3)",
+              }}
+            >
+              ${(pricePerHour * 4).toLocaleString()} total charter
+            </span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                backgroundColor: "rgba(76, 175, 80, 0.2)",
+                borderRadius: 100,
+                padding: "5px 14px",
+                border: "1px solid rgba(76, 175, 80, 0.3)",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#81C784",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                Split {splitGuests} ways
+              </span>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div
+            style={{
+              height: 1,
+              background:
+                "linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))",
+              display: "flex",
+              marginTop: 4,
+              marginBottom: 4,
+            }}
+          />
+
+          {/* Bottom row: App Store + tagline */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 8,
+                gap: 10,
+                backgroundColor: "#000",
+                borderRadius: 12,
+                padding: "9px 18px 9px 14px",
+                border: "1.5px solid rgba(255, 255, 255, 0.25)",
               }}
             >
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg, rgba(33,150,243,0.3), rgba(79,195,247,0.2))",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 18,
-                  color: "#4FC3F7",
-                  fontWeight: 700,
-                }}
+              <svg
+                width="24"
+                height="30"
+                viewBox="0 0 28 34"
+                fill="white"
               >
-                {hostName.charAt(0)}
-              </div>
-              <span style={{ fontSize: 18, fontWeight: 600, color: "#8EACCD" }}>
-                {hostName}
-              </span>
-            </div>
-            <span style={{ color: "#2A3A4C", fontSize: 18 }}>{"\u2022"}</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 18, color: "#FFB400" }}>
-                {"\u2605"}
-              </span>
-              <span style={{ fontSize: 18, fontWeight: 700, color: "#E8F0FE" }}>
-                {rating.toFixed(1)}
-              </span>
-            </div>
-          </div>
-
-          {/* Feature tags */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {features.map((feature, i) => (
+                <path d="M23.1 17.8c0-3.2 2.6-4.8 2.7-4.8-1.5-2.2-3.8-2.5-4.6-2.5-2-.2-3.8 1.2-4.8 1.2-1 0-2.5-1.1-4.1-1.1-2.1 0-4.1 1.2-5.2 3.1-2.2 3.8-.6 9.5 1.6 12.6 1.1 1.5 2.3 3.2 4 3.2 1.6-.1 2.2-1 4.1-1s2.5 1 4.1 1c1.7 0 2.8-1.5 3.9-3.1 1.2-1.8 1.7-3.5 1.8-3.6 0 0-3.5-1.3-3.5-5.1zM19.8 8c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.8.8-3.8 1.9-.8 1-1.6 2.5-1.4 4 1.5.1 2.9-.7 3.9-1.8z" />
+              </svg>
               <div
-                key={i}
                 style={{
-                  backgroundColor: "rgba(79, 195, 247, 0.08)",
-                  border: "1px solid rgba(79, 195, 247, 0.15)",
-                  borderRadius: 24,
-                  padding: "8px 20px",
                   display: "flex",
-                  alignItems: "center",
+                  flexDirection: "column",
                 }}
               >
                 <span
                   style={{
-                    fontSize: 15,
-                    color: "#8EACCD",
-                    fontWeight: 500,
+                    fontSize: 10,
+                    color: "#fff",
+                    fontWeight: 400,
+                    lineHeight: 1.2,
                   }}
                 >
-                  {feature}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Price callout */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 20,
-              backgroundColor: "rgba(33, 150, 243, 0.08)",
-              border: "1px solid rgba(79, 195, 247, 0.12)",
-              borderRadius: 20,
-              padding: "24px 28px",
-              marginTop: 8,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 4,
-              }}
-            >
-              <span style={{ fontSize: 14, color: "#5A7A9A", fontWeight: 600 }}>
-                CHARTER FROM
-              </span>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                <span
-                  style={{
-                    fontSize: 44,
-                    fontWeight: 800,
-                    color: "#4FC3F7",
-                    lineHeight: 1,
-                  }}
-                >
-                  ${pricePerHour}
+                  Download on the
                 </span>
                 <span
                   style={{
-                    fontSize: 18,
-                    color: "#5A7A9A",
-                    fontWeight: 500,
+                    fontSize: 20,
+                    color: "#fff",
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.02em",
                   }}
                 >
-                  /hr
+                  App Store
                 </span>
               </div>
             </div>
 
-            {/* Split price */}
+            <span
+              style={{
+                fontSize: 15,
+                color: "rgba(255,255,255,0.35)",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+              }}
+            >
+              Split the cost. Share the experience.
+            </span>
+          </div>
+        </div>
+
+        {/* ===== DECORATIVE (no-photo mode) ===== */}
+        {!photoUrl && (
+          <>
             <div
               style={{
-                height: 60,
-                width: 1,
-                backgroundColor: "rgba(79, 195, 247, 0.15)",
+                position: "absolute",
+                top: "15%",
+                left: "50%",
+                width: 600,
+                height: 600,
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, rgba(79, 195, 247, 0.08) 0%, transparent 70%)",
+                transform: "translateX(-50%)",
                 display: "flex",
               }}
             />
             <div
               style={{
+                position: "absolute",
+                top: isStory ? "18%" : isSquare ? "12%" : "15%",
+                left: 0,
+                right: 0,
                 display: "flex",
-                flexDirection: "column",
-                gap: 4,
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <span style={{ fontSize: 14, color: "#5A7A9A", fontWeight: 600 }}>
-                SPLIT {splitGuests} WAYS
-              </span>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                <span
-                  style={{
-                    fontSize: 44,
-                    fontWeight: 800,
-                    color: "#E8F0FE",
-                    lineHeight: 1,
-                  }}
-                >
-                  ${splitPrice}
-                </span>
-                <span
-                  style={{
-                    fontSize: 18,
-                    color: "#5A7A9A",
-                    fontWeight: 500,
-                  }}
-                >
-                  /person
-                </span>
-              </div>
+              <svg width="280" height="220" viewBox="0 0 200 160">
+                <path
+                  d="M0 110 Q25 100 50 110 Q75 120 100 110 Q125 100 150 110 Q175 120 200 110 L200 160 L0 160 Z"
+                  fill="rgba(79, 195, 247, 0.15)"
+                />
+                <path
+                  d="M0 125 Q30 115 60 125 Q90 135 120 125 Q150 115 180 125 Q195 130 200 125 L200 160 L0 160 Z"
+                  fill="rgba(79, 195, 247, 0.08)"
+                />
+                <path
+                  d="M55 110 Q60 135 100 135 Q140 135 145 110 Z"
+                  fill="rgba(79, 195, 247, 0.5)"
+                />
+                <line
+                  x1="100"
+                  y1="25"
+                  x2="100"
+                  y2="110"
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth="2.5"
+                />
+                <path
+                  d="M103 28 Q145 65 138 107 L103 107 Z"
+                  fill="rgba(255,255,255,0.12)"
+                />
+                <path
+                  d="M97 35 Q65 75 68 107 L97 107 Z"
+                  fill="rgba(255,255,255,0.08)"
+                />
+              </svg>
             </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: `0 ${pad}px ${pad}px ${pad}px`,
-          }}
-        >
-          <span style={{ fontSize: 16, color: "#2A3A4C", fontWeight: 500 }}>
-            splytyachts.com
-          </span>
-          <span style={{ fontSize: 14, color: "#1E2D3D", fontWeight: 500 }}>
-            Life's too short to yacht alone
-          </span>
-        </div>
+          </>
+        )}
       </div>
     ),
     { width: W, height: H }

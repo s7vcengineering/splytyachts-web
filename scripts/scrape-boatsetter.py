@@ -252,6 +252,7 @@ def discover_listing_ids(city="miami", state="fl"):
 #   zoom:        zoom level for search API
 
 CITIES = {
+    # --- Florida ---
     "miami": {
         "search_name": "Miami, FL, USA",
         "bounds": {
@@ -263,6 +264,7 @@ CITIES = {
         "price_min": 500,
         "browse_slug": "miami--fl--united-states",
         "zoom": "12",
+        "region": "Florida",
     },
     "fort-lauderdale": {
         "search_name": "Fort Lauderdale, FL, USA",
@@ -275,6 +277,20 @@ CITIES = {
         "price_min": 500,
         "browse_slug": "fort-lauderdale--fl--united-states",
         "zoom": "12",
+        "region": "Florida",
+    },
+    "palm-beach": {
+        "search_name": "West Palm Beach, FL, USA",
+        "bounds": {
+            "ne_lat": "26.75",
+            "ne_lng": "-80.01",
+            "sw_lat": "26.58",
+            "sw_lng": "-80.12",
+        },
+        "price_min": 400,
+        "browse_slug": "west-palm-beach--fl--united-states",
+        "zoom": "12",
+        "region": "Florida",
     },
     "key-west": {
         "search_name": "Key West, FL, USA",
@@ -287,6 +303,46 @@ CITIES = {
         "price_min": 300,
         "browse_slug": "key-west--fl--united-states",
         "zoom": "13",
+        "region": "Florida",
+    },
+    "tampa": {
+        "search_name": "Tampa, FL, USA",
+        "bounds": {
+            "ne_lat": "28.10",
+            "ne_lng": "-82.35",
+            "sw_lat": "27.82",
+            "sw_lng": "-82.60",
+        },
+        "price_min": 300,
+        "browse_slug": "tampa--fl--united-states",
+        "zoom": "11",
+        "region": "Florida",
+    },
+    "clearwater": {
+        "search_name": "Clearwater, FL, USA",
+        "bounds": {
+            "ne_lat": "28.05",
+            "ne_lng": "-82.72",
+            "sw_lat": "27.88",
+            "sw_lng": "-82.85",
+        },
+        "price_min": 200,
+        "browse_slug": "clearwater--fl--united-states",
+        "zoom": "12",
+        "region": "Florida",
+    },
+    "sarasota": {
+        "search_name": "Sarasota, FL, USA",
+        "bounds": {
+            "ne_lat": "27.42",
+            "ne_lng": "-82.47",
+            "sw_lat": "27.27",
+            "sw_lng": "-82.63",
+        },
+        "price_min": 200,
+        "browse_slug": "sarasota--fl--united-states",
+        "zoom": "12",
+        "region": "Florida",
     },
     "naples": {
         "search_name": "Naples, FL, USA",
@@ -299,7 +355,9 @@ CITIES = {
         "price_min": 300,
         "browse_slug": "naples--fl--united-states",
         "zoom": "11",
+        "region": "Florida",
     },
+    # --- California ---
     "los-angeles": {
         "search_name": "Los Angeles, CA, USA",
         "bounds": {
@@ -311,6 +369,7 @@ CITIES = {
         "price_min": 300,
         "browse_slug": "los-angeles--ca--united-states",
         "zoom": "11",
+        "region": "California",
     },
     "san-diego": {
         "search_name": "San Diego, CA, USA",
@@ -323,15 +382,235 @@ CITIES = {
         "price_min": 300,
         "browse_slug": "san-diego--ca--united-states",
         "zoom": "12",
+        "region": "California",
     },
+    "san-francisco": {
+        "search_name": "San Francisco, CA, USA",
+        "bounds": {
+            "ne_lat": "37.82",
+            "ne_lng": "-122.35",
+            "sw_lat": "37.70",
+            "sw_lng": "-122.52",
+        },
+        "price_min": 300,
+        "browse_slug": "san-francisco--ca--united-states",
+        "zoom": "12",
+        "region": "California",
+    },
+    # --- Other US ---
+    "new-york": {
+        "search_name": "New York, NY, USA",
+        "bounds": {
+            "ne_lat": "40.88",
+            "ne_lng": "-73.85",
+            "sw_lat": "40.65",
+            "sw_lng": "-74.07",
+        },
+        "price_min": 400,
+        "browse_slug": "new-york--ny--united-states",
+        "zoom": "11",
+        "region": "Northeast",
+    },
+    "chicago": {
+        "search_name": "Chicago, IL, USA",
+        "bounds": {
+            "ne_lat": "42.00",
+            "ne_lng": "-87.52",
+            "sw_lat": "41.80",
+            "sw_lng": "-87.75",
+        },
+        "price_min": 300,
+        "browse_slug": "chicago--il--united-states",
+        "zoom": "11",
+        "region": "Midwest",
+    },
+    "seattle": {
+        "search_name": "Seattle, WA, USA",
+        "bounds": {
+            "ne_lat": "47.72",
+            "ne_lng": "-122.24",
+            "sw_lat": "47.50",
+            "sw_lng": "-122.44",
+        },
+        "price_min": 300,
+        "browse_slug": "seattle--wa--united-states",
+        "zoom": "11",
+        "region": "Pacific Northwest",
+    },
+    "austin": {
+        "search_name": "Austin, TX, USA",
+        "bounds": {
+            "ne_lat": "30.52",
+            "ne_lng": "-97.60",
+            "sw_lat": "30.18",
+            "sw_lng": "-97.90",
+        },
+        "price_min": 200,
+        "browse_slug": "austin--tx--united-states",
+        "zoom": "11",
+        "region": "Texas",
+    },
+    # --- Mediterranean ---
     "ibiza": {
         "search_name": "Ibiza, Spain",
-        "bounds": None,  # radius search
+        "bounds": None,
         "price_min": 300,
-        "browse_slug": None,  # international — no browse pages
+        "browse_slug": None,
         "zoom": "10",
+        "region": "Mediterranean",
+    },
+    "cannes": {
+        "search_name": "Cannes, France",
+        "bounds": None,
+        "price_min": 300,
+        "browse_slug": None,
+        "zoom": "11",
+        "region": "Mediterranean",
+    },
+    "nice": {
+        "search_name": "Nice, France",
+        "bounds": None,
+        "price_min": 300,
+        "browse_slug": None,
+        "zoom": "11",
+        "region": "Mediterranean",
+    },
+    "saint-tropez": {
+        "search_name": "Saint-Tropez, France",
+        "bounds": None,
+        "price_min": 300,
+        "browse_slug": None,
+        "zoom": "12",
+        "region": "Mediterranean",
+    },
+    "amalfi": {
+        "search_name": "Amalfi, Italy",
+        "bounds": None,
+        "price_min": 200,
+        "browse_slug": None,
+        "zoom": "12",
+        "region": "Mediterranean",
+    },
+    "sardinia": {
+        "search_name": "Olbia, Italy",
+        "bounds": None,
+        "price_min": 200,
+        "browse_slug": None,
+        "zoom": "10",
+        "region": "Mediterranean",
+    },
+    "sicily": {
+        "search_name": "Catania, Italy",
+        "bounds": None,
+        "price_min": 200,
+        "browse_slug": None,
+        "zoom": "10",
+        "region": "Mediterranean",
     },
 }
+
+
+# ---------------------------------------------------------------------------
+# City alias normalization — roll suburbs into main city names
+# ---------------------------------------------------------------------------
+
+CITY_ALIASES = {
+    # Miami metro
+    "Miami Beach": "Miami",
+    "North Bay Village": "Miami",
+    "Bay Harbor Islands": "Miami",
+    "Key Biscayne": "Miami",
+    "Sunny Isles Beach": "Miami",
+    "North Miami": "Miami",
+    "Coral Gables": "Miami",
+    "Aventura": "Miami",
+    "Coconut Grove": "Miami",
+    "Doral": "Miami",
+    "Bal Harbour": "Miami",
+    "Surfside": "Miami",
+    "Fisher Island": "Miami",
+    # Fort Lauderdale metro
+    "Dania Beach": "Fort Lauderdale",
+    "Pompano Beach": "Fort Lauderdale",
+    "Lauderdale-by-the-Sea": "Fort Lauderdale",
+    "Lauderdale-By-The-Sea": "Fort Lauderdale",
+    "Hollywood": "Fort Lauderdale",
+    "Hallandale Beach": "Fort Lauderdale",
+    "Deerfield Beach": "Fort Lauderdale",
+    # Key West area
+    "Stock Island": "Key West",
+    "Naval Air Station Key West": "Key West",
+    "Key Colony Beach": "Key West",
+    "Marathon": "Key West",
+    "Islamorada": "Key West",
+    # Palm Beach area
+    "West Palm Beach": "Palm Beach",
+    "Lake Worth": "Palm Beach",
+    "Boca Raton": "Palm Beach",
+    "Delray Beach": "Palm Beach",
+    "Jupiter": "Palm Beach",
+    "Singer Island": "Palm Beach",
+    # Tampa Bay area
+    "St. Petersburg": "Tampa",
+    "St Petersburg": "Tampa",
+    "Tierra Verde": "Tampa",
+    "Apollo Beach": "Tampa",
+    "Ruskin": "Tampa",
+    # Clearwater area
+    "Indian Rocks Beach": "Clearwater",
+    "Dunedin": "Clearwater",
+    "Tarpon Springs": "Clearwater",
+    # San Diego metro
+    "Coronado": "San Diego",
+    "Chula Vista": "San Diego",
+    "National City": "San Diego",
+    "Point Loma": "San Diego",
+    # LA metro
+    "Marina del Rey": "Los Angeles",
+    "Marina Del Rey": "Los Angeles",
+    "Redondo Beach": "Los Angeles",
+    "Long Beach": "Los Angeles",
+    "Manhattan Beach": "Los Angeles",
+    "Hermosa Beach": "Los Angeles",
+    "Playa del Rey": "Los Angeles",
+    "San Pedro": "Los Angeles",
+    "Newport Beach": "Los Angeles",
+    "Huntington Beach": "Los Angeles",
+    # San Francisco Bay
+    "Sausalito": "San Francisco",
+    "Tiburon": "San Francisco",
+    "Emeryville": "San Francisco",
+    "Oakland": "San Francisco",
+    "Berkeley": "San Francisco",
+    "Alameda": "San Francisco",
+    # Mediterranean aliases
+    "Eivissa": "Ibiza",
+    "Sant Antoni de Portmany": "Ibiza",
+    "Santa Eulalia del Rio": "Ibiza",
+    "Santa Eulària des Riu": "Ibiza",
+    "Olbia": "Sardinia",
+    "Porto Cervo": "Sardinia",
+    "Catania": "Sicily",
+    "Palermo": "Sicily",
+    "Taormina": "Sicily",
+    "Positano": "Amalfi",
+    "Sorrento": "Amalfi",
+    "Salerno": "Amalfi",
+    "Mougins": "Cannes",
+    "Antibes": "Cannes",
+    "Juan-les-Pins": "Cannes",
+    "Villefranche-sur-Mer": "Nice",
+    "Saint-Jean-Cap-Ferrat": "Nice",
+    "Ramatuelle": "Saint-Tropez",
+    "Gassin": "Saint-Tropez",
+}
+
+
+def normalize_city(raw_city):
+    """Normalize a city name using the alias map. Returns the canonical name."""
+    if not raw_city:
+        return "Unknown"
+    return CITY_ALIASES.get(raw_city, raw_city)
 
 # Backwards-compatible default
 MIAMI_BOUNDS = CITIES["miami"]["bounds"]
@@ -492,7 +771,8 @@ def extract_listing(listing_id):
     loc = listing.get("location") or {}
     lat = loc.get("lat") or loc.get("owner_pin_latitude")
     lng = loc.get("lng") or loc.get("owner_pin_longitude")
-    city = loc.get("city") or "Unknown"
+    raw_city = loc.get("city") or "Unknown"
+    city = normalize_city(raw_city)
     region = loc.get("state") or ""
 
     # --- Captain ---
@@ -820,6 +1100,88 @@ def write_scrape_log(tracker, supabase_url, supabase_key):
 
 
 # ---------------------------------------------------------------------------
+# Deactivation: mark boats that are no longer on Boatsetter
+# ---------------------------------------------------------------------------
+
+def deactivate_stale_boats(discovered_ids, supabase_url, supabase_key, tracker):
+    """Mark boats as inactive if they weren't found in the latest all-cities scrape.
+
+    Only called in --all-cities mode when we have a comprehensive view of
+    what's currently listed on Boatsetter.
+    """
+    log.info("")
+    log.info("DEACTIVATE Checking for stale boats not found in this scrape...")
+
+    # Fetch all active boatsetter_listing_ids from the database
+    all_active = []
+    offset = 0
+    page_size = 500
+    while True:
+        req = urllib.request.Request(
+            f"{supabase_url}/rest/v1/boats?select=boatsetter_listing_id,name&is_active=eq.true&limit={page_size}&offset={offset}",
+            headers={
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                page = json.loads(resp.read().decode())
+                if not page:
+                    break
+                all_active.extend(page)
+                if len(page) < page_size:
+                    break
+                offset += page_size
+        except Exception as e:
+            log.error("DEACTIVATE Failed to fetch active boats: %s", e)
+            return
+
+    log.info("DEACTIVATE %d active boats in database, %d discovered in this scrape",
+             len(all_active), len(discovered_ids))
+
+    # Find boats that are active in DB but were NOT discovered
+    stale = [
+        b for b in all_active
+        if b["boatsetter_listing_id"] not in discovered_ids
+    ]
+
+    if not stale:
+        log.info("DEACTIVATE No stale boats found — all active boats were discovered")
+        return
+
+    log.info("DEACTIVATE Found %d stale boats to deactivate:", len(stale))
+    for b in stale:
+        log.info("  %s — %s", b["boatsetter_listing_id"], b.get("name", "?")[:60])
+
+    # Deactivate each stale boat
+    deactivated = 0
+    for b in stale:
+        lid = b["boatsetter_listing_id"]
+        patch_data = json.dumps({"is_active": False}).encode("utf-8")
+        req = urllib.request.Request(
+            f"{supabase_url}/rest/v1/boats?boatsetter_listing_id=eq.{lid}",
+            data=patch_data,
+            headers={
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}",
+                "Content-Type": "application/json",
+                "Prefer": "return=minimal",
+            },
+            method="PATCH",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=10):
+                deactivated += 1
+                log.info("DEACTIVATE Deactivated %s — %s", lid, b.get("name", "?")[:50])
+        except Exception as e:
+            log.error("DEACTIVATE Failed to deactivate %s: %s", lid, e)
+            tracker.record_error(lid, f"deactivate_failed: {e}")
+
+    log.info("DEACTIVATE Done: %d/%d stale boats deactivated", deactivated, len(stale))
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -1109,6 +1471,10 @@ def main():
 
     if tracker.upserts_failed > 0:
         log.warning("UPSERT    %d upserts FAILED — check errors above", tracker.upserts_failed)
+
+    # --- Deactivate stale boats (only in --all-cities mode) ---
+    if args.all_cities and listing_ids:
+        deactivate_stale_boats(set(listing_ids), supabase_url, supabase_key, tracker)
 
     # --- Write audit log ---
     write_scrape_log(tracker, supabase_url, supabase_key)

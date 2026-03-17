@@ -1,0 +1,97 @@
+name: Scrape Airbnb Experiences
+
+on:
+  schedule:
+    # Once daily at 7 AM UTC (3 AM EST)
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      city:
+        description: "City to scrape (leave empty for all cities)"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - miami
+          - fort-lauderdale
+          - los-angeles
+          - san-diego
+          - new-york
+          - key-west
+          - naples-fl
+          - ibiza
+          - cannes
+          - nice
+          - saint-tropez
+          - monaco
+          - amalfi-coast
+          - capri
+          - positano
+          - naples-it
+          - rome
+          - florence
+          - venice
+          - lake-como
+          - sardinia
+          - sicily
+          - portofino
+          - milan
+      category:
+        description: "Filter by category (optional)"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - outdoors
+          - dining
+          - food-tours
+          - cooking
+          - water-sports
+          - cultural-tours
+          - wellness
+      dry_run:
+        description: "Dry run (no database writes)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          INPUT_CITY: ${{ inputs.city }}
+          INPUT_CATEGORY: ${{ inputs.category }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ -n "$INPUT_CITY" ]; then
+            ARGS="--city $INPUT_CITY"
+          else
+            ARGS="--all-cities"
+          fi
+
+          if [ -n "$INPUT_CATEGORY" ]; then
+            ARGS="$ARGS --category $INPUT_CATEGORY"
+          fi
+
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          python3 scripts/scrape-airbnb-experiences.py $ARGS

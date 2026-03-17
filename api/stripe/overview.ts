@@ -14,7 +14,7 @@ async function stripeGet(path: string, apiKey: string) {
 }
 
 export default async function handler(req: Request) {
-  const apiKey = process.env.STRIPE_SECRET_KEY;
+  const apiKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY_PROD;
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'STRIPE_SECRET_KEY not configured' }), {
       status: 500,
