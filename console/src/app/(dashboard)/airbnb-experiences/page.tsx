@@ -17,7 +17,7 @@ async function getData(params: Record<string, string | undefined>) {
   let query = supabase
     .from("airbnb_experiences")
     .select(
-      "id, title, city, price_amount, price_type, rating, review_count, category, photo_urls, source_url, duration",
+      "id, title, city, price_amount, price_type, rating, review_count, category, photo_urls, source_url, duration_minutes",
       { count: "exact" },
     );
 
@@ -181,9 +181,9 @@ export default async function AirbnbExperiencesPage({ searchParams }: Props) {
                   ) : null}
                 </div>
 
-                {exp.duration ? (
+                {exp.duration_minutes ? (
                   <p className="text-ocean-500 text-[10px] mt-2">
-                    {exp.duration as string}
+                    {exp.duration_minutes as number} min
                   </p>
                 ) : null}
 

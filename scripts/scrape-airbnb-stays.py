@@ -74,7 +74,7 @@ HEADERS = {
 }
 
 REQUEST_DELAY = 3.0  # seconds between requests (be respectful)
-DEFAULT_LIMIT = 100  # top 100 per city
+DEFAULT_LIMIT = 250  # top 250 per city
 
 # City configurations: slug -> (display_name, region, country_code, place_id)
 CITIES = {
@@ -129,6 +129,10 @@ def build_search_url(city_slug, items_offset=0):
         "query": query,
         "place_id": place_id,
         "price_filter_num_nights": "1",
+        "price_filter_input_type": "0",
+        "search_mode": "regular_search",
+        "search_type": "filter_change",
+        "price_min": "100",
     }
 
     if items_offset > 0:
