@@ -132,7 +132,7 @@ def build_search_url(city_slug, items_offset=0):
     }
 
     if items_offset > 0:
-        cursor_data = {"section_offset": 3, "items_offset": items_offset, "version": 1}
+        cursor_data = {"section_offset": 0, "items_offset": items_offset, "version": 1}
         cursor = base64.b64encode(json.dumps(cursor_data).encode()).decode()
         params["cursor"] = cursor
 
@@ -176,24 +176,29 @@ def find_search_results(deferred_state):
 
         value = entry[1] if isinstance(entry[1], dict) else {}
         data = value.get("data", {})
-
-        # Try different paths the search results might be at
         presentation = data.get("presentation", {})
 
-        # Stays search uses staysSearch or explore.sections
-        search_data = (
-            presentation.get("staysSearch", {}).get("results", {})
-            or presentation.get("explore", {}).get("sections", {})
-        )
+        # Current Airbnb structure: staysSearch -> results
+        stays_search = presentation.get("staysSearch", {})
+        if stays_search:
+            results_obj = stays_search.get("results", {})
+            search_results = results_obj.get("searchResults", [])
+            if search_results:
+                pagination = results_obj.get("paginationInfo", {})
+                # Get next page cursor from pageCursors list
+                cursors = pagination.get("pageCursors", [])
+                next_cursor = cursors[1] if len(cursors) > 1 else None
+                return search_results, next_cursor
 
-        if not search_data:
-            continue
-
-        search_results = search_data.get("searchResults", [])
-        if search_results:
-            pagination = search_data.get("paginationInfo", {})
-            next_cursor = pagination.get("nextPageCursor")
-            return search_results, next_cursor
+        # Fallback: explore -> sections
+        explore = presentation.get("explore", {})
+        sections = explore.get("sections", {})
+        if sections:
+            search_results = sections.get("searchResults", [])
+            if search_results:
+                pagination = sections.get("paginationInfo", {})
+                next_cursor = pagination.get("nextPageCursor")
+                return search_results, next_cursor
 
     # Fallback: search recursively for searchResults
     results = _find_key_recursive(deferred_state, "searchResults")
@@ -231,15 +236,31 @@ def _find_key_recursive(obj, target_key, max_depth=10):
 # ---------------------------------------------------------------------------
 
 def parse_listing(result, city_slug):
-    """Parse a single stay search result into our schema."""
+    """Parse a single stay search result into our schema.
+
+    As of 2026-03, Airbnb's search results use a flat structure with:
+    - demandStayListing: id (base64), location, description
+    - title, subtitle, avgRatingLocalized, avgRatingA11yLabel at top level
+    - structuredDisplayPrice for pricing
+    - contextualPictures for photos
+    - structuredContent.primaryLine for room details (bedrooms, beds)
+    - badges for labels (Guest favourite, Superhost, etc.)
+    """
     city_info = CITIES.get(city_slug, ("Unknown", "??", "US", ""))
     display_name, region, country_code, _ = city_info
 
-    listing = result.get("listing", {})
-    if not listing:
-        return None
+    # Extract listing ID from demandStayListing (base64-encoded)
+    demand = result.get("demandStayListing", {}) or {}
+    raw_id = demand.get("id", "")
+    listing_id = None
+    if raw_id:
+        try:
+            decoded = base64.b64decode(raw_id).decode("utf-8")
+            # Format: "DemandStayListing:1234567890"
+            listing_id = decoded.split(":")[-1] if ":" in decoded else decoded
+        except Exception:
+            listing_id = raw_id
 
-    listing_id = listing.get("id")
     if not listing_id:
         return None
 
@@ -255,141 +276,126 @@ def parse_listing(result, city_slug):
         "last_scraped_at": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
-    # Title
-    data["title"] = listing.get("name", listing.get("title", f"Listing {listing_id}"))
+    # Title — use subtitle as name (subtitle has the actual listing name),
+    # title is generic like "Home in Miami"
+    title = result.get("title", "")
+    subtitle = result.get("subtitle", "")
+    data["title"] = subtitle if subtitle else title if title else f"Listing {listing_id}"
 
-    # Property type
-    room_type = listing.get("roomTypeCategory", "")
-    if room_type:
-        data["property_type"] = room_type
-
-    # Also check for structured content
-    struct_content = listing.get("structuredContent", {})
-    if struct_content:
-        primary_line = struct_content.get("primaryLine", {})
-        if primary_line:
-            bodies = primary_line.get("body", [])
-            for body in bodies:
-                text = body if isinstance(body, str) else body.get("text", "") if isinstance(body, dict) else ""
-                if text:
-                    data["property_type"] = text
-                    break
-
-    # Location / neighborhood
-    neighborhood = listing.get("neighborhood", {})
-    if isinstance(neighborhood, dict):
-        data["neighborhood"] = neighborhood.get("name", "")
-    elif isinstance(neighborhood, str):
-        data["neighborhood"] = neighborhood
-
-    city_name = listing.get("city", "")
-    if city_name:
-        data["city"] = city_name
-
-    # Coordinates
-    coordinate = listing.get("coordinate", {})
-    if coordinate:
-        lat = coordinate.get("latitude")
-        lng = coordinate.get("longitude")
-        if lat:
-            data["latitude"] = float(lat)
-        if lng:
-            data["longitude"] = float(lng)
-
-    # Bedrooms / beds / bathrooms / guests
-    for key in ("bedrooms", "beds", "bathrooms"):
-        val = listing.get(key)
-        if val is not None:
-            data[key] = val
-
-    guests = listing.get("personCapacity") or listing.get("guestLabel", "")
-    if isinstance(guests, int):
-        data["max_guests"] = guests
-    elif isinstance(guests, str):
-        m = re.search(r'(\d+)', guests)
+    # Property type from title (e.g., "Home in Miami", "Condo in Miami Beach")
+    if title:
+        m = re.match(r'^(\w[\w\s]*?)\s+in\s+', title)
         if m:
-            data["max_guests"] = int(m.group(1))
+            data["property_type"] = m.group(1)
 
-    # Rating
-    avg_rating = listing.get("avgRating") or listing.get("avgRatingA11yLabel", "")
-    if isinstance(avg_rating, (int, float)):
-        data["rating"] = float(avg_rating)
-    elif isinstance(avg_rating, str):
-        m = re.search(r'([\d.]+)', avg_rating)
+    # Coordinates from demandStayListing.location
+    location = demand.get("location", {}) or {}
+    coordinate = location.get("coordinate", {}) or {}
+    lat = coordinate.get("latitude")
+    lng = coordinate.get("longitude")
+    if lat:
+        data["latitude"] = float(lat)
+    if lng:
+        data["longitude"] = float(lng)
+
+    # Room details from structuredContent.primaryLine
+    struct_content = result.get("structuredContent", {}) or {}
+    primary_items = struct_content.get("primaryLine", []) or []
+    for item in primary_items:
+        body = item.get("body", "") if isinstance(item, dict) else ""
+        if not body:
+            continue
+        m_beds = re.match(r'(\d+)\s+bedroom', body, re.IGNORECASE)
+        if m_beds:
+            data["bedrooms"] = int(m_beds.group(1))
+        m_beds_count = re.match(r'(\d+)\s+bed(?!room)', body, re.IGNORECASE)
+        if m_beds_count:
+            data["beds"] = int(m_beds_count.group(1))
+        m_bath = re.match(r'([\d.]+)\s+bath', body, re.IGNORECASE)
+        if m_bath:
+            data["bathrooms"] = float(m_bath.group(1))
+        m_guests = re.match(r'(\d+)\s+guest', body, re.IGNORECASE)
+        if m_guests:
+            data["max_guests"] = int(m_guests.group(1))
+
+    # Rating and review count from avgRatingLocalized (e.g., "4.99 (370)")
+    # and avgRatingA11yLabel (e.g., "4.99 out of 5 average rating,  370 reviews")
+    rating_localized = result.get("avgRatingLocalized", "")
+    rating_label = result.get("avgRatingA11yLabel", "")
+
+    if rating_localized and rating_localized != "New":
+        m = re.search(r'([\d.]+)', rating_localized)
         if m:
             data["rating"] = float(m.group(1))
+        m_reviews = re.search(r'\((\d[\d,]*)\)', rating_localized)
+        if m_reviews:
+            data["review_count"] = int(m_reviews.group(1).replace(",", ""))
 
-    review_count = listing.get("reviewsCount", 0)
-    if review_count:
-        data["review_count"] = int(review_count)
+    if "review_count" not in data and rating_label:
+        m_reviews = re.search(r'(\d[\d,]*)\s+review', rating_label)
+        if m_reviews:
+            data["review_count"] = int(m_reviews.group(1).replace(",", ""))
 
-    # Host
-    host = listing.get("user", {})
-    if host:
-        data["host_name"] = host.get("firstName", host.get("name", ""))
-        data["is_superhost"] = host.get("isSuperHost", False) or host.get("isSuperhost", False)
+    # Price from structuredDisplayPrice
+    sdp = result.get("structuredDisplayPrice", {}) or {}
+    primary_line = sdp.get("primaryLine", {}) or {}
+    explanation = sdp.get("explanationData", {}) or {}
 
-    # Price
-    pricing = result.get("pricingQuote", {}) or result.get("pricing", {})
-    if pricing:
-        rate = pricing.get("rate", {})
-        amount = rate.get("amount") if rate else None
-        if amount:
-            data["nightly_rate"] = int(float(amount))
+    # Try to get nightly rate from explanation details (e.g., "5 nights x $489.52")
+    price_details = explanation.get("priceDetails", []) or []
+    for group in price_details:
+        items = group.get("items", []) or []
+        for item in items:
+            desc = item.get("description", "")
+            m = re.search(r'[\$€£]([\d,.]+)', desc)
+            if m and "night" in desc.lower():
+                nightly = float(m.group(1).replace(",", ""))
+                data["nightly_rate"] = int(round(nightly))
+                break
+        if "nightly_rate" in data:
+            break
 
-        # Also check structuredStayDisplayPrice
-        structured = pricing.get("structuredStayDisplayPrice", {})
-        if structured:
-            primary_line = structured.get("primaryLine", {})
-            price_str = primary_line.get("price", "") or primary_line.get("accessibilityLabel", "")
-            if price_str and "nightly_rate" not in data:
-                m = re.search(r'[\$€£]([\d,]+)', price_str)
-                if m:
-                    data["nightly_rate"] = int(m.group(1).replace(",", ""))
-
-    # Also try displayPrice from result
+    # Fallback: derive from total price / nights
     if "nightly_rate" not in data:
-        display_price = result.get("displayPrice", {})
-        primary_line = display_price.get("primaryLine", {})
-        price_str = primary_line.get("accessibilityLabel", "")
-        if price_str:
-            m = re.search(r'[\$€£]([\d,]+)', price_str)
-            if m:
-                data["nightly_rate"] = int(m.group(1).replace(",", ""))
+        acc_label = primary_line.get("accessibilityLabel", "")
+        qualifier = primary_line.get("qualifier", "")
+        # e.g., "$2,448 for 5 nights"
+        label = acc_label or f"{primary_line.get('price', '')} {qualifier}"
+        m_total = re.search(r'[\$€£]([\d,]+)', label)
+        m_nights = re.search(r'(\d+)\s+night', label)
+        if m_total and m_nights:
+            total = int(m_total.group(1).replace(",", ""))
+            nights = int(m_nights.group(1))
+            if nights > 0:
+                data["nightly_rate"] = int(round(total / nights))
 
-    # Images
+    # Images from contextualPictures
     photo_urls = []
-    context_images = listing.get("contextualPictures", [])
-    for pic in context_images:
+    for pic in result.get("contextualPictures", []) or []:
         url = pic.get("picture", "")
         if url and url not in photo_urls:
             photo_urls.append(url)
-
-    # Also check main picture
-    main_picture = listing.get("picture", {})
-    if main_picture:
-        url = main_picture.get("picture", "")
-        if url and url not in photo_urls:
-            photo_urls.insert(0, url)
-
     data["photo_urls"] = photo_urls[:20]
 
-    # Badges (Superhost, Guest Favourite, etc.)
+    # Badges
     badges = []
-    for badge in listing.get("formattedBadges", []):
-        text = badge.get("text", "")
-        if text:
-            badges.append(text)
-    for badge in result.get("searchBadges", []):
-        texts = badge.get("texts", [])
-        for t in texts:
-            if t and t not in badges:
-                badges.append(t)
+    for badge in result.get("badges", []) or []:
+        # badge can be dict with text or string
+        if isinstance(badge, dict):
+            text = badge.get("text", "") or badge.get("title", "")
+            if text:
+                badges.append(text)
+        elif isinstance(badge, str) and badge:
+            badges.append(badge)
     data["badges"] = badges
 
     # Superhost from badges
     if any("superhost" in b.lower() for b in badges):
         data["is_superhost"] = True
+
+    # Guest favourite badge
+    if any("guest fav" in b.lower() for b in badges):
+        pass  # just tracked in badges list
 
     return data
 
