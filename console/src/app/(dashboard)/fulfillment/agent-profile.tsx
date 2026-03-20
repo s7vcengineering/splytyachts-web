@@ -8,6 +8,7 @@ interface AgentInfo {
   codename: string;
   role: string;
   avatar: string;
+  photo: string;
   color: string;
   phase: string;
   intro: string;
@@ -16,12 +17,13 @@ interface AgentInfo {
   motto: string;
 }
 
-const AGENTS: Record<string, AgentInfo> = {
+export const AGENTS: Record<string, AgentInfo> = {
   deposits_collecting: {
     name: "Marcus Cole",
     codename: "deposit-hustler",
     role: "Deposit Collection Specialist",
     avatar: "MC",
+    photo: "/agents/marcus-cole.jpg",
     color: "bg-yellow-500",
     phase: "Phase 1",
     intro:
@@ -41,6 +43,7 @@ const AGENTS: Record<string, AgentInfo> = {
     codename: "booking-executor",
     role: "Booking Execution Agent",
     avatar: "DR",
+    photo: "/agents/dominic-reyes.jpg",
     color: "bg-cyan-500",
     phase: "Phase 1",
     intro:
@@ -60,6 +63,7 @@ const AGENTS: Record<string, AgentInfo> = {
     codename: "captain-liaison",
     role: "Captain & Operator Liaison",
     avatar: "RS",
+    photo: "/agents/rafael-santos.jpg",
     color: "bg-purple-500",
     phase: "Phase 2",
     intro:
@@ -79,6 +83,7 @@ const AGENTS: Record<string, AgentInfo> = {
     codename: "trip-coordinator",
     role: "Trip Coordination & Confirmation",
     avatar: "NP",
+    photo: "/agents/nathan-park.jpg",
     color: "bg-green-500",
     phase: "Phase 2",
     intro:
@@ -98,6 +103,7 @@ const AGENTS: Record<string, AgentInfo> = {
     codename: "invoice-closer",
     role: "Post-Trip & Revenue Operations",
     avatar: "VC",
+    photo: "/agents/victor-chen.jpg",
     color: "bg-emerald-500",
     phase: "Phase 3",
     intro:
@@ -130,14 +136,11 @@ export function AgentProfile({ stage }: { stage: string }) {
             : "bg-ocean-800/50 hover:bg-ocean-800 border border-transparent",
         )}
       >
-        <div
-          className={cn(
-            "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0",
-            agent.color,
-          )}
-        >
-          {agent.avatar}
-        </div>
+        <img
+          src={agent.photo}
+          alt={agent.name}
+          className="w-7 h-7 rounded-full object-cover shrink-0"
+        />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold text-white truncate">
             {agent.name}
