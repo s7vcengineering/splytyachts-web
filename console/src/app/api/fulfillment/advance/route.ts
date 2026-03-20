@@ -58,6 +58,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Fire agent message to the group thread (non-blocking)
+    const baseUrl =
+      req.headers.get("x-forwarded-proto") + "://" + req.headers.get("host");
+    fetch(`${baseUrl}/api/fulfillment/agent-message`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ experience_id, stage: target_stage }),
+    }).catch(() => {
+      // Non-blocking — don't fail the advance if messaging fails
+    });
+
     return NextResponse.json({ ok: true, stage: target_stage });
   } catch {
     return NextResponse.json(
